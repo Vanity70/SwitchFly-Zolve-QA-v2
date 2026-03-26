@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Zolve × Switchfly — QA Dashboard</title>
+<style>
+:root{
+  --db:#1F4E79;--mb:#2E75B6;--lb:#D6E4F0;
+  --dg:#1E5C30;--amber:#7B3F00;--red:#C0392B;--orange:#D35400;
+  --pass-bg:#E2EFDA;--pass-fg:#1E5C30;--pass-bd:#A9D18E;
+  --fail-bg:#FCE4D6;--fail-fg:#C0392B;--fail-bd:#F4B183;
+  --pend-bg:#FFF2CC;--pend-fg:#7B3F00;--pend-bd:#FFD966;
+  --row-alt:#F3F8FD;--brd:#D0D7DE;--text:#1a1a2e;--sub:#666;
+  --r:8px;--sh:0 2px 12px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF3F9;color:var(--text);min-height:100vh}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--db) 0%,var(--mb) 100%);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.2);gap:12px;flex-wrap:wrap}
+.hdr h1{color:#fff;font-size:1.25rem;font-weight:700}
+.hdr p{color:rgba(255,255,255,.7);font-size:.76rem;margin-top:3px}
+.hdr-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sync-badge{background:rgba(255,255,255,.15);color:#fff;padding:5px 13px;border-radius:20px;font-size:.72rem;font-weight:600;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sync-dot.loading{background:#fbbf24;animation:spin 1s linear infinite}
+.sync-dot.error{background:#f87171;animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.refresh-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:5px 13px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;transition:background .15s}
+.refresh-btn:hover{background:rgba(255,255,255,.3)}
+#last-updated{color:rgba(255,255,255,.6);font-size:.7rem}
+
+/* KPI BAR */
+.kpi-bar{display:flex;gap:10px;padding:16px 32px;flex-wrap:wrap}
+.kpi{background:#fff;border-radius:var(--r);padding:13px 18px;flex:1;min-width:110px;box-shadow:var(--sh);border-top:4px solid var(--mb);display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:currentColor;opacity:.08}
+.kpi.pass{border-color:var(--pass-fg)}.kpi.fail{border-color:var(--fail-fg)}.kpi.pend{border-color:var(--pend-fg)}.kpi.iss{border-color:var(--red)}.kpi.imp{border-color:var(--amber)}
+.kn{font-size:1.8rem;font-weight:800;line-height:1;color:var(--db);transition:all .3s}
+.kl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.kpi.pass .kn{color:var(--pass-fg)}.kpi.fail .kn{color:var(--fail-fg)}.kpi.pend .kn{color:var(--pend-fg)}.kpi.iss .kn{color:var(--red)}.kpi.imp .kn{color:var(--amber)}
+
+/* TABS */
+.tab-bar{display:flex;padding:0 32px;gap:2px;flex-wrap:wrap}
+.tab{padding:9px 15px;border-radius:7px 7px 0 0;cursor:pointer;font-size:.79rem;font-weight:600;color:var(--sub);background:#dde5ef;border:1px solid transparent;border-bottom:none;transition:all .15s;user-select:none}
+.tab:hover{background:#cdd8e8;color:var(--db)}
+.tab.active{background:#fff;color:var(--db);border-color:var(--brd);border-bottom:2px solid #fff;margin-bottom:-1px;z-index:1}
+.tab .tab-count{display:inline-block;background:rgba(0,0,0,.1);border-radius:8px;padding:1px 6px;font-size:.65rem;margin-left:4px}
+.tab.active .tab-count{background:var(--lb);color:var(--db)}
+
+/* CONTENT */
+.content{background:#fff;margin:0 32px 32px;border-radius:0 var(--r) var(--r) var(--r);box-shadow:var(--sh);border:1px solid var(--brd);overflow:hidden;min-height:300px}
+.pane{display:none}.pane.active{display:block}
+
+/* LOADING OVERLAY */
+.loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;color:var(--sub)}
+.spinner{width:36px;height:36px;border:3px solid var(--lb);border-top-color:var(--mb);border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-overlay p{font-size:.85rem}
+
+/* ERROR STATE */
+.error-box{margin:32px;padding:20px 24px;background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);border-left:4px solid var(--red)}
+.error-box h3{color:var(--red);font-size:.9rem;margin-bottom:8px}
+.error-box p{font-size:.8rem;color:#7f1d1d;line-height:1.6}
+.error-box code{background:#FEE2E2;padding:2px 6px;border-radius:4px;font-size:.75rem}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+thead tr{background:var(--db)}
+thead th{color:#fff;font-weight:700;padding:10px 11px;text-align:left;white-space:nowrap;font-size:.71rem;text-transform:uppercase;letter-spacing:.4px}
+tbody tr:nth-child(even){background:var(--row-alt)}
+tbody tr:hover{background:#e4eef8;transition:background .1s}
+tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;line-height:1.5}
+.sr td{background:var(--mb) !important;color:#fff;font-weight:700;font-size:.75rem;padding:7px 11px;letter-spacing:.3px}
+
+/* BADGES */
+.tc-id{font-family:'Courier New',monospace;font-weight:700;color:var(--db);font-size:.75rem;white-space:nowrap}
+.pri{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.65rem;font-weight:700;white-space:nowrap}
+.pc{background:#FDECEA;color:#C0392B;border:1px solid #F4B183}
+.ph{background:#FFF2CC;color:#7B3F00;border:1px solid #FFD966}
+.pm{background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9}
+.pl{background:#F0F4F8;color:#555;border:1px solid #ccc}
+.st{display:inline-block;padding:3px 9px;border-radius:12px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.sp{background:var(--pass-bg);color:var(--pass-fg);border:1px solid var(--pass-bd)}
+.sf{background:var(--fail-bg);color:var(--fail-fg);border:1px solid var(--fail-bd)}
+.sn{background:var(--pend-bg);color:var(--pend-fg);border:1px solid var(--pend-bd)}
+.act-cell{color:var(--orange);font-style:italic;font-size:.73rem;line-height:1.45}
+.note-tag{display:inline-block;background:#EDE9FE;color:#5B21B6;border-radius:4px;padding:1px 6px;font-size:.68rem;font-style:normal;margin-top:3px}
+.steps{white-space:pre-line;font-size:.72rem;color:#444}
+.exp{font-size:.72rem;color:#1e4d22}
+
+/* FILTER BAR */
+.fb{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--brd);flex-wrap:wrap;background:#fafbfc}
+.fb label{font-size:.72rem;font-weight:600;color:var(--sub)}
+.fb select,.fb input{padding:5px 9px;border:1px solid var(--brd);border-radius:5px;font-size:.75rem;background:#fff;color:var(--text);outline:none}
+.fb select:focus,.fb input:focus{border-color:var(--mb)}
+.fb input{min-width:180px}
+.fc{margin-left:auto;font-size:.72rem;color:var(--sub);font-style:italic}
+
+/* SUMMARY */
+.sw{padding:24px}
+.sw-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.sw-hdr h2{font-size:.95rem;font-weight:700;color:var(--db)}
+.sw-hdr span{font-size:.75rem;color:var(--sub)}
+.sum-t{width:100%;border-collapse:collapse;font-size:.8rem}
+.sum-t thead tr{background:var(--db)}
+.sum-t thead th{color:#fff;padding:10px 13px;text-align:left;font-size:.71rem;text-transform:uppercase;letter-spacing:.4px}
+.sum-t tbody tr:nth-child(even){background:var(--row-alt)}
+.sum-t tbody tr:hover{background:#e4eef8}
+.sum-t td{padding:10px 13px;border-bottom:1px solid var(--brd)}
+.sum-t .tr td{background:var(--db);color:#fff;font-weight:700}
+.pb{display:flex;align-items:center;gap:6px}
+.pbr{height:7px;border-radius:4px;background:#e0e8f0;flex:1;overflow:hidden;min-width:70px}
+.pbf{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* ISSUES */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.ic{padding:22px}.ic:first-child{border-right:1px solid var(--brd)}
+.ich{display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:800;margin-bottom:16px;padding-bottom:9px;border-bottom:2px solid}
+.ic.maj .ich{color:var(--red);border-color:var(--red)}
+.ic.imp .ich{color:var(--amber);border-color:var(--amber)}
+.icard{border:1px solid var(--brd);border-radius:var(--r);margin-bottom:11px;overflow:hidden;transition:box-shadow .15s}
+.icard:hover{box-shadow:var(--sh)}
+.icard.maj{border-left:4px solid var(--red)}
+.icard.imp{border-left:4px solid var(--amber)}
+.it{padding:9px 13px 5px;font-weight:700;font-size:.79rem;background:#fafafa}
+.ib{padding:5px 13px 12px;font-size:.76rem;color:#444;line-height:1.6}
+
+/* RESPONSIVE */
+@media(max-width:860px){
+  .ig{grid-template-columns:1fr}.ic:first-child{border-right:none;border-bottom:1px solid var(--brd)}
+  .kpi-bar,.tab-bar{padding-left:14px;padding-right:14px}
+  .content{margin:0 0 24px}
+  .hdr{padding:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <h1>Zolve × Switchfly — Z Points QA Dashboard</h1>
+    <p>Live data from Google Sheets &nbsp;·&nbsp; Auto-refreshes every 60 seconds</p>
+  </div>
+  <div class="hdr-right">
+    <span id="last-updated"></span>
+    <button class="refresh-btn" onclick="loadAllSheets()">↻ Refresh</button>
+    <div class="sync-badge">
+      <div class="sync-dot loading" id="sync-dot"></div>
+      <span id="sync-label">Loading…</span>
+    </div>
+  </div>
+</div>
+
+<!-- KPI BAR -->
+<div class="kpi-bar">
+  <div class="kpi">       <div class="kn" id="k-total" style="color:var(--db)">—</div><div class="kl">Total Test Cases</div></div>
+  <div class="kpi pass">  <div class="kn" id="k-pass">—</div><div class="kl">✓ Passed</div></div>
+  <div class="kpi fail">  <div class="kn" id="k-fail">—</div><div class="kl">✗ Failed</div></div>
+  <div class="kpi pend">  <div class="kn" id="k-pend">—</div><div class="kl">⏳ Pending</div></div>
+  <div class="kpi iss">   <div class="kn" id="k-iss" style="color:var(--red)">—</div><div class="kl">🔴 Major Issues</div></div>
+  <div class="kpi imp">   <div class="kn" id="k-imp" style="color:var(--amber)">—</div><div class="kl">🟡 Improvements</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab(this,'summary')">📊 Summary</div>
+  <div class="tab" onclick="showTab(this,'zpoints')">💎 Z Points <span class="tab-count" id="tc-zp">—</span></div>
+  <div class="tab" onclick="showTab(this,'rewards')">🏅 Rewards <span class="tab-count" id="tc-rwd">—</span></div>
+  <div class="tab" onclick="showTab(this,'concurrent')">📱 Multi-Device <span class="tab-count" id="tc-con">—</span></div>
+  <div class="tab" onclick="showTab(this,'edge')">⚠️ Edge Cases <span class="tab-count" id="tc-edg">—</span></div>
+  <div class="tab" onclick="showTab(this,'issues')">🐛 Issues</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- SUMMARY -->
+  <div class="pane active" id="pane-summary">
+    <div class="sw">
+      <div class="sw-hdr">
+        <h2>Coverage &amp; Status by Module</h2>
+        <span id="sum-subtitle">Fetching live data…</span>
+      </div>
+      <div id="sum-area">
+        <div class="loading-overlay"><div class="spinner"></div><p>Loading summary from Google Sheets…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Z POINTS -->
+  <div class="pane" id="pane-zpoints">
+    <div class="fb">
+      <label>Status:</label>
+      <select onchange="applyFilter('zp')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <label>Priority:</label>
+      <select onchange="applyFilter('zp')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
+      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('zp')"/>
+      <span class="fc" id="zp-c"></span>
+    </div>
+    <div class="tbl-wrap" id="wrap-zp">
+      <div class="loading-overlay"><div class="spinner"></div><p>Loading test cases…</p></div>
+    </div>
+  </div>
+
+  <!-- REWARDS -->
+  <div class="pane" id="pane-rewards">
+    <div class="fb">
+      <label>Status:</label>
+      <select onchange="applyFilter('rwd')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('rwd')"/>
+      <span class="fc" id="rwd-c"></span>
+    </div>
+    <div class="tbl-wrap" id="wrap-rwd">
+      <div class="loading-overlay"><div class="spinner"></div><p>Loading test cases…</p></div>
+    </div>
+  </div>
+
+  <!-- CONCURRENT -->
+  <div class="pane" id="pane-concurrent">
+    <div class="fb">
+      <label>Status:</label>
+      <select onchange="applyFilter('con')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('con')"/>
+      <span class="fc" id="con-c"></span>
+    </div>
+    <div class="tbl-wrap" id="wrap-con">
+      <div class="loading-overlay"><div class="spinner"></div><p>Loading test cases…</p></div>
+    </div>
+  </div>
+
+  <!-- EDGE CASES -->
+  <div class="pane" id="pane-edge">
+    <div class="fb">
+      <label>Status:</label>
+      <select onchange="applyFilter('edg')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <label>Priority:</label>
+      <select onchange="applyFilter('edg')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
+      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('edg')"/>
+      <span class="fc" id="edg-c"></span>
+    </div>
+    <div class="tbl-wrap" id="wrap-edg">
+      <div class="loading-overlay"><div class="spinner"></div><p>Loading test cases…</p></div>
+    </div>
+  </div>
+
+  <!-- ISSUES -->
+  <div class="pane" id="pane-issues">
+    <div class="ig">
+      <div class="ic maj">
+        <div class="ich">🔴 Major Issues <span style="font-size:.72rem;font-weight:400;margin-left:4px" id="maj-count"></span></div>
+        <div id="maj-list"><div class="loading-overlay"><div class="spinner"></div><p>Loading…</p></div></div>
+      </div>
+      <div class="ic imp">
+        <div class="ich">🟡 Improvements <span style="font-size:.72rem;font-weight:400;margin-left:4px" id="imp-count"></span></div>
+        <div id="imp-list"><div class="loading-overlay"><div class="spinner"></div><p>Loading…</p></div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SHEET_ID = '1ytPFFWVN-xqYon00eRnrMuTq9gAqlfS47DzvuWrQTz0';
+const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
+
+const SHEET_MAP = {
+  zp:  '💎 Z Points Redemption',
+  rwd: '🏅 Rewards Display & History',
+  con: '📱 Concurrent & Multi-Device',
+  edg: '⚠️ Edge Cases',
+  sum: '📊 Summary',
+  iss: 'Issues',
+};
+
+// ── CSV PARSER ────────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const rows = [];
+  let i = 0, n = text.length;
+  while (i < n) {
+    const row = [];
+    while (i < n && text[i] !== '\n') {
+      if (text[i] === '"') {
+        let cell = ''; i++;
+        while (i < n) {
+          if (text[i] === '"' && text[i+1] === '"') { cell += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { cell += text[i++]; }
+        }
+        row.push(cell.trim());
+      } else {
+        let cell = '';
+        while (i < n && text[i] !== ',' && text[i] !== '\n') cell += text[i++];
+        row.push(cell.trim());
+      }
+      if (i < n && text[i] === ',') i++;
+    }
+    if (i < n) i++; // skip \n
+    if (row.some(c => c !== '')) rows.push(row);
+  }
+  return rows;
+}
+
+// ── FETCH A SHEET ─────────────────────────────────────────────────────────────
+async function fetchSheet(key) {
+  const name = encodeURIComponent(SHEET_MAP[key]);
+  const url  = BASE_URL + name;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return parseCSV(await res.text());
+}
+
+// ── BADGES ────────────────────────────────────────────────────────────────────
+function stBadge(s) {
+  const k = (s||'').toLowerCase().trim();
+  if (k === 'pass')    return `<span class="st sp">✓ Pass</span>`;
+  if (k === 'fail')    return `<span class="st sf">✗ Fail</span>`;
+  return `<span class="st sn">⏳ Pending</span>`;
+}
+function priBadge(p) {
+  const k = (p||'').toLowerCase().trim();
+  if (k === 'critical') return `<span class="pri pc">Critical</span>`;
+  if (k === 'high')     return `<span class="pri ph">High</span>`;
+  if (k === 'medium')   return `<span class="pri pm">Medium</span>`;
+  if (k === 'low')      return `<span class="pri pl">Low</span>`;
+  return '';
+}
+
+// ── RENDER TC TABLE ───────────────────────────────────────────────────────────
+// Columns from sheet: TC ID | Category | Sub-Category | Test Scenario |
+//   Pre-conditions | Test Steps | Expected Result | Actual Result | Priority | Status
+// (row[0]=ID, row[2]=sub, row[3]=scenario, row[4]=pre, row[5]=steps,
+//  row[6]=expected, row[7]=actual, row[8]=pri, row[9]=status)
+
+function buildTCTable(rows, key) {
+  // skip title row (row[0]) and header row (row[1])
+  const data = rows.slice(2);
+  let html = `<table>
+    <thead><tr>
+      <th>TC ID</th><th>Sub-Category</th>
+      <th style="min-width:210px">Test Scenario</th>
+      <th style="min-width:170px">Pre-conditions</th>
+      <th style="min-width:190px">Test Steps</th>
+      <th style="min-width:190px">Expected Result</th>
+      <th style="min-width:170px">Actual Result</th>
+      <th>Priority</th><th>Status</th>
+    </tr></thead><tbody id="body-${key}">`;
+
+  let count = 0;
+  data.forEach(r => {
+    const id = r[0] || '';
+    // Section header row: has content in col 0 but no TC ID format and rest empty
+    if (id.startsWith('  ') || (!id.match(/^TC-/) && id !== '')) {
+      html += `<tr class="sr"><td colspan="9">${id.trim()}</td></tr>`;
+      return;
+    }
+    if (!id.match(/^TC-/)) return;
+    count++;
+    const sub      = r[2] || '';
+    const scenario = r[3] || '';
+    const pre      = r[4] || '';
+    const steps    = (r[5] || '').replace(/\\n/g, '\n');
+    const exp      = r[6] || '';
+    const actual   = r[7] || '';
+    const pri      = r[8] || '';
+    const status   = r[9] || 'Pending';
+
+    const actCell = actual
+      ? `<td class="act-cell">${actual}</td>`
+      : `<td style="color:#ccc;font-size:.7rem">—</td>`;
+
+    html += `<tr
+      data-s="${status.toLowerCase().trim()}"
+      data-p="${pri.toLowerCase().trim()}"
+      data-q="${(scenario + ' ' + sub).toLowerCase()}">
+      <td class="tc-id">${id}</td>
+      <td><strong>${sub}</strong></td>
+      <td>${scenario}</td>
+      <td style="font-size:.72rem;color:#555">${pre}</td>
+      <td class="steps">${steps}</td>
+      <td class="exp">${exp}</td>
+      ${actCell}
+      <td>${priBadge(pri)}</td>
+      <td>${stBadge(status)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  return { html, count };
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function applyFilter(key) {
+  const wrap = document.getElementById('wrap-' + key);
+  if (!wrap) return;
+  const selects = wrap.closest('.pane').querySelectorAll('.fb select');
+  const input   = wrap.closest('.pane').querySelector('.fb input');
+  const statusF = selects[0] ? selects[0].value.toLowerCase() : '';
+  const priF    = selects[1] ? selects[1].value.toLowerCase() : '';
+  const textF   = input ? input.value.toLowerCase() : '';
+
+  const rows = document.querySelectorAll(`#body-${key} tr:not(.sr)`);
+  let shown = 0, total = rows.length;
+  rows.forEach(r => {
+    let vis = true;
+    if (statusF && r.dataset.s !== statusF) vis = false;
+    if (priF    && r.dataset.p !== priF)    vis = false;
+    if (textF   && !r.dataset.q.includes(textF)) vis = false;
+    r.style.display = vis ? '' : 'none';
+    if (vis) shown++;
+  });
+  const cEl = document.getElementById(key + '-c');
+  if (cEl) cEl.textContent = shown === total ? `${total} test cases` : `Showing ${shown} of ${total}`;
+}
+
+// ── RENDER SUMMARY ────────────────────────────────────────────────────────────
+function buildSummary(rows) {
+  // rows: title(0), headers(1), data(2..9), total(10)
+  const dataRows = rows.slice(2).filter(r => r[0] && r[0] !== 'TOTAL');
+  let html = `<table class="sum-t">
+    <thead><tr>
+      <th>Sheet</th><th>Category</th><th>Section</th>
+      <th style="text-align:center"># TCs</th>
+      <th style="text-align:center">Pass</th>
+      <th style="text-align:center">Fail</th>
+      <th style="text-align:center">Pending</th>
+      <th style="min-width:160px">Progress</th>
+    </tr></thead><tbody>`;
+
+  let totN=0,totP=0,totF=0,totQ=0;
+  dataRows.forEach(r => {
+    const n = parseInt(r[3]) || 0;
+    const p = parseInt(r[4]) || 0;
+    const f = parseInt(r[6]) || 0;  // col G = Fail
+    const q = parseInt(r[5]) || 0;  // col F = Pending — wait, let me check header order
+    // Header: Sheet | Category | Section | # TCs | Pending | Pass | Fail
+    // Actually from original data: col3=total, col4=pending, col5=pass, col6=fail
+    // Re-map based on actual sheet columns
+    const total   = parseInt(r[3]) || 0;
+    const pending = parseInt(r[4]) || 0;
+    const pass_n  = parseInt(r[5]) || 0;
+    const fail_n  = parseInt(r[6]) || 0;
+    totN+=total; totP+=pass_n; totF+=fail_n; totQ+=pending;
+
+    const pct = total ? Math.round(pass_n / total * 100) : 0;
+    const col = pct===100 ? 'var(--pass-fg)' : pct > 50 ? 'var(--mb)' : 'var(--pend-fg)';
+    html += `<tr>
+      <td><strong>${r[0]}</strong></td>
+      <td>${r[1]}</td>
+      <td>${r[2]}</td>
+      <td style="text-align:center;font-weight:700">${total}</td>
+      <td style="text-align:center"><span style="color:var(--pass-fg);font-weight:700">${pass_n}</span></td>
+      <td style="text-align:center"><span style="color:var(--fail-fg);font-weight:700">${fail_n || '—'}</span></td>
+      <td style="text-align:center"><span style="color:var(--pend-fg);font-weight:700">${pending}</span></td>
+      <td><div class="pb">
+        <div class="pbr"><div class="pbf" style="width:${pct}%;background:${col}"></div></div>
+        <span style="font-size:.7rem;color:var(--sub);min-width:28px">${pct}%</span>
+      </div></td>
+    </tr>`;
+  });
+
+  const tp = totN ? Math.round(totP/totN*100) : 0;
+  html += `<tr class="tr">
+    <td colspan="3"><strong>TOTAL</strong></td>
+    <td style="text-align:center"><strong>${totN}</strong></td>
+    <td style="text-align:center"><strong>${totP}</strong></td>
+    <td style="text-align:center"><strong>${totF}</strong></td>
+    <td style="text-align:center"><strong>${totQ}</strong></td>
+    <td><div class="pb">
+      <div class="pbr" style="background:rgba(255,255,255,.25)">
+        <div class="pbf" style="width:${tp}%;background:#90EE90"></div>
+      </div>
+      <span style="font-size:.7rem;min-width:28px">${tp}%</span>
+    </div></td>
+  </tr></tbody></table>`;
+
+  // Update KPIs
+  document.getElementById('k-total').textContent = totN;
+  document.getElementById('k-pass').textContent  = totP;
+  document.getElementById('k-fail').textContent  = totF;
+  document.getElementById('k-pend').textContent  = totQ;
+
+  return html;
+}
+
+// ── RENDER ISSUES ─────────────────────────────────────────────────────────────
+// Issues sheet layout: col A = Major Issues, col B = Improvements
+// Alternating: title row, body row, blank, title row, body row, blank…
+function buildIssues(rows) {
+  const major = [], impr = [];
+  // skip header row (row 0)
+  const data = rows.slice(1);
+  for (let i = 0; i < data.length; i++) {
+    const r = data[i];
+    const majTitle = r[0], impTitle = r[1];
+    if (!majTitle && !impTitle) continue;
+    // next row is the body
+    const next = data[i+1] || [];
+    if (majTitle && majTitle.match(/^\d+\./)) {
+      major.push({ t: majTitle.replace(/^\d+\.\s*/, ''), b: next[0] || '' });
+    }
+    if (impTitle && impTitle.match(/^\d+\./)) {
+      impr.push({ t: impTitle.replace(/^\d+\.\s*/, ''), b: next[1] || '' });
+    }
+  }
+  return { major, impr };
+}
+
+function renderIssueCards(items, containerId, cls) {
+  const el = document.getElementById(containerId);
+  if (!items.length) { el.innerHTML = '<p style="color:var(--sub);font-size:.8rem;padding:8px">No items found.</p>'; return; }
+  el.innerHTML = items.map((x, i) =>
+    `<div class="icard ${cls}">
+      <div class="it">${i+1}. ${x.t}</div>
+      <div class="ib">${x.b}</div>
+    </div>`
+  ).join('');
+  return items.length;
+}
+
+// ── MAIN LOAD ─────────────────────────────────────────────────────────────────
+async function loadAllSheets() {
+  setSyncState('loading', 'Loading…');
+
+  try {
+    // Load all sheets in parallel
+    const [zpRows, rwdRows, conRows, edgRows, sumRows, issRows] = await Promise.all([
+      fetchSheet('zp'),
+      fetchSheet('rwd'),
+      fetchSheet('con'),
+      fetchSheet('edg'),
+      fetchSheet('sum'),
+      fetchSheet('iss'),
+    ]);
+
+    // ── Summary
+    const sumHTML = buildSummary(sumRows);
+    document.getElementById('sum-area').innerHTML = sumHTML;
+    const now = new Date();
+    document.getElementById('sum-subtitle').textContent =
+      `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+
+    // ── TC tables
+    const sheets = [
+      { key:'zp',  rows:zpRows  },
+      { key:'rwd', rows:rwdRows },
+      { key:'con', rows:conRows },
+      { key:'edg', rows:edgRows },
+    ];
+    sheets.forEach(({ key, rows }) => {
+      const { html, count } = buildTCTable(rows, key);
+      document.getElementById('wrap-' + key).innerHTML = html;
+      document.getElementById(key + '-c').textContent  = count + ' test cases';
+      document.getElementById('tc-' + key).textContent = count;
+    });
+
+    // ── Issues
+    const { major, impr } = buildIssues(issRows);
+    const majN = renderIssueCards(major, 'maj-list', 'maj');
+    const impN = renderIssueCards(impr,  'imp-list', 'imp');
+    document.getElementById('maj-count').textContent = `(${majN})`;
+    document.getElementById('imp-count').textContent = `(${impN})`;
+    document.getElementById('k-iss').textContent = majN;
+    document.getElementById('k-imp').textContent = impN;
+
+    // ── Sync state
+    const t = new Date();
+    document.getElementById('last-updated').textContent =
+      `Updated ${t.toLocaleTimeString()}`;
+    setSyncState('live', 'Live');
+
+  } catch (err) {
+    console.error(err);
+    setSyncState('error', 'Error');
+
+    const errorHTML = `
+      <div class="error-box">
+        <h3>⚠️ Could not load data from Google Sheets</h3>
+        <p>Make sure your sheet is published to the web:<br/>
+        <strong>Google Sheets → File → Share → Publish to web → Publish each sheet as CSV</strong></p>
+        <p style="margin-top:10px">If already published, the browser may be blocking the request due to CORS.
+        Try opening this file from a web server (e.g. VS Code Live Server, or drag into Chrome from a local HTTP server)
+        rather than directly as a <code>file://</code> path.</p>
+        <p style="margin-top:10px;color:#6b7280;font-size:.75rem">Error: ${err.message}</p>
+      </div>`;
+
+    ['sum-area','wrap-zp','wrap-rwd','wrap-con','wrap-edg','maj-list','imp-list']
+      .forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=errorHTML; });
+  }
+}
+
+function setSyncState(state, label) {
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  lbl.textContent = label;
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function showTab(el, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pane-' + id).classList.add('active');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadAllSheets();
+// Auto-refresh every 60 seconds
+setInterval(loadAllSheets, 60000);
+</script>
+
+</body>
+</html>
