@@ -416,9 +416,88 @@ function applyFilter(key) {
 }
 
 // ── RENDER SUMMARY ────────────────────────────────────────────────────────────
-function buildSummary(rows) {
-  // rows: title(0), headers(1), data(2..9), total(10)
-  const dataRows = rows.slice(2).filter(r => r[0] && r[0] !== 'TOTAL');
+function buildSummary(allTCData) {
+  // Compute counts live from actual TC sheet rows — never trust the Summary sheet values
+  const SHEET_SECTIONS = {
+    '💎 Z Points Redemption': ['POINTS-ONLY REDEMPTION', 'HYBRID PAYMENT', 'REFUND'],
+    '🏅 Rewards Display & History': ['REWARDS SECTION'],
+    '📱 Concurrent & Multi-Device': ['SIMULTANEOUS SESSIONS'],
+    '⚠️ Edge Cases': ['BOUNDARY', 'NETWORK', 'PRODUCT-SPECIFIC'],
+  };
+
+  const SECTION_LABELS = {
+    'POINTS-ONLY REDEMPTION': 'Points-Only Redemption',
+    'HYBRID PAYMENT':         'Z Points + Credit Card',
+    'REFUND':                 'Points Refund & Reversal',
+    'REWARDS SECTION':        'Transaction Description & History',
+    'SIMULTANEOUS SESSIONS':  'Simultaneous Sessions',
+    'BOUNDARY':               'Points Thresholds & Arithmetic',
+    'NETWORK':                'Network & Session Edge Cases',
+    'PRODUCT-SPECIFIC':       'Product-Specific Edge Cases',
+  };
+
+  const CATEGORY_LABELS = {
+    'POINTS-ONLY REDEMPTION': 'Z Points Only',
+    'HYBRID PAYMENT':         'Hybrid Payment',
+    'REFUND':                 'Refund',
+    'REWARDS SECTION':        'Rewards Display',
+    'SIMULTANEOUS SESSIONS':  'Concurrent',
+    'BOUNDARY':               'Boundary',
+    'NETWORK':                'Network/Session',
+    'PRODUCT-SPECIFIC':       'Product-Specific',
+  };
+
+  // Parse each TC sheet and count by section
+  const results = [];
+  let grandTotal = 0, grandPass = 0, grandFail = 0, grandPend = 0;
+
+  for (const [sheetName, rows] of Object.entries(allTCData)) {
+    const sectionCounts = {};
+    let currentSection = null;
+
+    for (let i = 2; i < rows.length; i++) {
+      const r = rows[i];
+      const col0 = (r[0] || '').trim();
+
+      // Detect section header rows (leading spaces or no TC- prefix)
+      if (!col0.startsWith('TC-')) {
+        if (col0) {
+          // Match section key by checking if any known key appears in the header text
+          const matchedKey = Object.keys(SECTION_LABELS).find(k =>
+            col0.toUpperCase().includes(k)
+          );
+          if (matchedKey) {
+            currentSection = matchedKey;
+            sectionCounts[currentSection] = { total: 0, pass: 0, fail: 0, pending: 0 };
+          }
+        }
+        continue;
+      }
+
+      if (!currentSection) continue;
+
+      const status = (r[9] || '').toString().trim().toLowerCase();
+      sectionCounts[currentSection].total++;
+      if (status === 'pass')       sectionCounts[currentSection].pass++;
+      else if (status === 'fail')  sectionCounts[currentSection].fail++;
+      else                         sectionCounts[currentSection].pending++;
+    }
+
+    for (const [secKey, counts] of Object.entries(sectionCounts)) {
+      results.push({
+        sheet:    sheetName,
+        category: CATEGORY_LABELS[secKey] || secKey,
+        section:  SECTION_LABELS[secKey]  || secKey,
+        ...counts,
+      });
+      grandTotal += counts.total;
+      grandPass  += counts.pass;
+      grandFail  += counts.fail;
+      grandPend  += counts.pending;
+    }
+  }
+
+  // Build table HTML
   let html = `<table class="sum-t">
     <thead><tr>
       <th>Sheet</th><th>Category</th><th>Section</th>
@@ -429,31 +508,17 @@ function buildSummary(rows) {
       <th style="min-width:160px">Progress</th>
     </tr></thead><tbody>`;
 
-  let totN=0,totP=0,totF=0,totQ=0;
-  dataRows.forEach(r => {
-    const n = parseInt(r[3]) || 0;
-    const p = parseInt(r[4]) || 0;
-    const f = parseInt(r[6]) || 0;  // col G = Fail
-    const q = parseInt(r[5]) || 0;  // col F = Pending — wait, let me check header order
-    // Header: Sheet | Category | Section | # TCs | Pending | Pass | Fail
-    // Actually from original data: col3=total, col4=pending, col5=pass, col6=fail
-    // Re-map based on actual sheet columns
-    const total   = parseInt(r[3]) || 0;
-    const pending = parseInt(r[4]) || 0;
-    const pass_n  = parseInt(r[5]) || 0;
-    const fail_n  = parseInt(r[6]) || 0;
-    totN+=total; totP+=pass_n; totF+=fail_n; totQ+=pending;
-
-    const pct = total ? Math.round(pass_n / total * 100) : 0;
-    const col = pct===100 ? 'var(--pass-fg)' : pct > 50 ? 'var(--mb)' : 'var(--pend-fg)';
+  results.forEach(r => {
+    const pct = r.total ? Math.round(r.pass / r.total * 100) : 0;
+    const col = pct === 100 ? 'var(--pass-fg)' : pct > 50 ? 'var(--mb)' : 'var(--pend-fg)';
     html += `<tr>
-      <td><strong>${r[0]}</strong></td>
-      <td>${r[1]}</td>
-      <td>${r[2]}</td>
-      <td style="text-align:center;font-weight:700">${total}</td>
-      <td style="text-align:center"><span style="color:var(--pass-fg);font-weight:700">${pass_n}</span></td>
-      <td style="text-align:center"><span style="color:var(--fail-fg);font-weight:700">${fail_n || '—'}</span></td>
-      <td style="text-align:center"><span style="color:var(--pend-fg);font-weight:700">${pending}</span></td>
+      <td><strong>${r.sheet}</strong></td>
+      <td>${r.category}</td>
+      <td>${r.section}</td>
+      <td style="text-align:center;font-weight:700">${r.total}</td>
+      <td style="text-align:center"><span style="color:var(--pass-fg);font-weight:700">${r.pass}</span></td>
+      <td style="text-align:center"><span style="color:var(--fail-fg);font-weight:700">${r.fail || '—'}</span></td>
+      <td style="text-align:center"><span style="color:var(--pend-fg);font-weight:700">${r.pending}</span></td>
       <td><div class="pb">
         <div class="pbr"><div class="pbf" style="width:${pct}%;background:${col}"></div></div>
         <span style="font-size:.7rem;color:var(--sub);min-width:28px">${pct}%</span>
@@ -461,13 +526,13 @@ function buildSummary(rows) {
     </tr>`;
   });
 
-  const tp = totN ? Math.round(totP/totN*100) : 0;
-  html += `<tr class="tr">
+  const tp = grandTotal ? Math.round(grandPass / grandTotal * 100) : 0;
+  html += `<tr class="tr-total">
     <td colspan="3"><strong>TOTAL</strong></td>
-    <td style="text-align:center"><strong>${totN}</strong></td>
-    <td style="text-align:center"><strong>${totP}</strong></td>
-    <td style="text-align:center"><strong>${totF}</strong></td>
-    <td style="text-align:center"><strong>${totQ}</strong></td>
+    <td style="text-align:center"><strong>${grandTotal}</strong></td>
+    <td style="text-align:center"><strong>${grandPass}</strong></td>
+    <td style="text-align:center"><strong>${grandFail}</strong></td>
+    <td style="text-align:center"><strong>${grandPend}</strong></td>
     <td><div class="pb">
       <div class="pbr" style="background:rgba(255,255,255,.25)">
         <div class="pbf" style="width:${tp}%;background:#90EE90"></div>
@@ -476,15 +541,14 @@ function buildSummary(rows) {
     </div></td>
   </tr></tbody></table>`;
 
-  // Update KPIs
-  document.getElementById('k-total').textContent = totN;
-  document.getElementById('k-pass').textContent  = totP;
-  document.getElementById('k-fail').textContent  = totF;
-  document.getElementById('k-pend').textContent  = totQ;
+  // Update KPI bar
+  document.getElementById('k-total').textContent = grandTotal;
+  document.getElementById('k-pass').textContent  = grandPass;
+  document.getElementById('k-fail').textContent  = grandFail;
+  document.getElementById('k-pend').textContent  = grandPend;
 
   return html;
 }
-
 // ── RENDER ISSUES ─────────────────────────────────────────────────────────────
 // Issues sheet layout: col A = Major Issues, col B = Improvements
 // Alternating: title row, body row, blank, title row, body row, blank…
@@ -536,7 +600,13 @@ async function loadAllSheets() {
     ]);
 
     // ── Summary
-    const sumHTML = buildSummary(sumRows);
+    const allTCData = {
+  '💎 Z Points Redemption':    zpRows,
+  '🏅 Rewards Display & History': rwdRows,
+  '📱 Concurrent & Multi-Device': conRows,
+  '⚠️ Edge Cases':             edgRows,
+};
+    const sumHTML = buildSummary(allTCData);
     document.getElementById('sum-area').innerHTML = sumHTML;
     const now = new Date();
     document.getElementById('sum-subtitle').textContent =
