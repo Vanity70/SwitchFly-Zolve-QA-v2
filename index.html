@@ -55,8 +55,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF3F9;color:var(--text
 table{width:100%;border-collapse:collapse;font-size:.78rem}
 thead tr{background:var(--db)}
 thead th{color:#fff;font-weight:700;padding:10px 11px;text-align:left;white-space:nowrap;font-size:.71rem;text-transform:uppercase;letter-spacing:.4px}
-tbody tr:nth-child(even){background:var(--row-alt)}
-tbody tr:hover{background:#e4eef8;transition:background .1s}
+tbody tr:hover{background:#e4eef8 !important;transition:background .1s}
 tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;line-height:1.5}
 .sr td{background:var(--mb) !important;color:#fff;font-weight:700;font-size:.75rem;padding:7px 11px;letter-spacing:.3px}
 /* API sheet section headers get teal colour */
@@ -94,7 +93,6 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
 .sum-t thead tr{background:var(--db)}
 .sum-t thead th{color:#fff;padding:10px 13px;text-align:left;font-size:.71rem;text-transform:uppercase;letter-spacing:.4px}
 .sum-t.api thead tr{background:var(--teal)}
-.sum-t tbody tr:nth-child(even){background:var(--row-alt)}
 .sum-t tbody tr:hover{background:#e4eef8}
 .sum-t td{padding:10px 13px;border-bottom:1px solid var(--brd)}
 .sum-t .tr-total td{background:var(--db);color:#fff;font-weight:700}
@@ -176,10 +174,10 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="pane" id="pane-zpoints">
     <div class="fb">
       <label>Status:</label>
-      <select onchange="applyFilter('zp')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <select id="f-zp-s" onchange="applyFilter('zp')"><option value="">All</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
       <label>Priority:</label>
-      <select onchange="applyFilter('zp')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
-      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('zp')"/>
+      <select id="f-zp-p" onchange="applyFilter('zp')"><option value="">All</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select>
+      <input id="f-zp-q" type="text" placeholder="Search scenarios…" oninput="applyFilter('zp')"/>
       <span class="fc" id="zp-c"></span>
     </div>
     <div class="tbl-wrap" id="wrap-zp">
@@ -191,8 +189,8 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="pane" id="pane-rewards">
     <div class="fb">
       <label>Status:</label>
-      <select onchange="applyFilter('rwd')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
-      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('rwd')"/>
+      <select id="f-rwd-s" onchange="applyFilter('rwd')"><option value="">All</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
+      <input id="f-rwd-q" type="text" placeholder="Search scenarios…" oninput="applyFilter('rwd')"/>
       <span class="fc" id="rwd-c"></span>
     </div>
     <div class="tbl-wrap" id="wrap-rwd">
@@ -204,8 +202,8 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="pane" id="pane-concurrent">
     <div class="fb">
       <label>Status:</label>
-      <select onchange="applyFilter('con')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
-      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('con')"/>
+      <select id="f-con-s" onchange="applyFilter('con')"><option value="">All</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
+      <input id="f-con-q" type="text" placeholder="Search scenarios…" oninput="applyFilter('con')"/>
       <span class="fc" id="con-c"></span>
     </div>
     <div class="tbl-wrap" id="wrap-con">
@@ -217,10 +215,10 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="pane" id="pane-edge">
     <div class="fb">
       <label>Status:</label>
-      <select onchange="applyFilter('edg')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <select id="f-edg-s" onchange="applyFilter('edg')"><option value="">All</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
       <label>Priority:</label>
-      <select onchange="applyFilter('edg')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
-      <input type="text" placeholder="Search scenarios…" oninput="applyFilter('edg')"/>
+      <select id="f-edg-p" onchange="applyFilter('edg')"><option value="">All</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select>
+      <input id="f-edg-q" type="text" placeholder="Search scenarios…" oninput="applyFilter('edg')"/>
       <span class="fc" id="edg-c"></span>
     </div>
     <div class="tbl-wrap" id="wrap-edg">
@@ -232,12 +230,12 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="pane" id="pane-api">
     <div class="fb">
       <label>Status:</label>
-      <select onchange="applyFilter('api')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <select id="f-api-s" onchange="applyFilter('api')"><option value="">All</option><option value="pass">Pass</option><option value="fail">Fail</option><option value="pending">Pending</option></select>
       <label>Method:</label>
-      <select onchange="applyFilter('api')"><option value="">All</option><option>GET</option><option>POST</option></select>
+      <select id="f-api-m" onchange="applyFilter('api')"><option value="">All</option><option value="get">GET</option><option value="post">POST</option></select>
       <label>Priority:</label>
-      <select onchange="applyFilter('api')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
-      <input type="text" placeholder="Search endpoint or scenario…" oninput="applyFilter('api')"/>
+      <select id="f-api-p" onchange="applyFilter('api')"><option value="">All</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option></select>
+      <input id="f-api-q" type="text" placeholder="Search endpoint or scenario…" oninput="applyFilter('api')"/>
       <span class="fc" id="api-c"></span>
     </div>
     <div class="tbl-wrap" id="wrap-api">
@@ -368,7 +366,9 @@ function buildTCTable(rows, key) {
     const actCell = actual
       ? `<td class="act-cell">${actual}</td>`
       : `<td style="color:#ccc;font-size:.7rem">—</td>`;
+    const rowBg = count % 2 === 0 ? '' : 'var(--row-alt)';
     html += `<tr
+      style="background:${rowBg}"
       data-s="${status.toLowerCase().trim()}"
       data-p="${pri.toLowerCase().trim()}"
       data-m=""
@@ -432,8 +432,9 @@ function buildAPITable(rows) {
     const actCell = actual
       ? `<td class="act-cell">${actual}</td>`
       : `<td style="color:#ccc;font-size:.7rem">—</td>`;
-
+    const rowBg = count % 2 === 0 ? '' : 'var(--row-alt)';
     html += `<tr
+      style="background:${rowBg}"
       data-s="${status.toLowerCase().trim()}"
       data-p="${pri.toLowerCase().trim()}"
       data-m="${method.toLowerCase().trim()}"
@@ -456,34 +457,55 @@ function buildAPITable(rows) {
 }
 
 // ── FILTER ──────────────────────────────────────────────────────────────────
+// Each filter control has a stable id: f-{key}-s (status), f-{key}-p (priority),
+// f-{key}-m (method, API only), f-{key}-q (search text input).
+// Reading by ID avoids the positional select[] indexing that caused silent failures.
 function applyFilter(key) {
-  const pane    = document.getElementById('pane-' + key);
-  if (!pane) return;
-  const selects = pane.querySelectorAll('.fb select');
-  const input   = pane.querySelector('.fb input');
+  const getVal = id => { const el = document.getElementById(id); return el ? el.value.toLowerCase().trim() : ''; };
 
-  // For API pane: select[0]=status, select[1]=method, select[2]=priority
-  // For others:   select[0]=status, select[1]=priority (no method)
-  const isAPI   = key === 'api';
-  const statusF = selects[0] ? selects[0].value.toLowerCase() : '';
-  const methodF = isAPI && selects[1] ? selects[1].value.toLowerCase() : '';
-  const priF    = isAPI ? (selects[2] ? selects[2].value.toLowerCase() : '')
-                        : (selects[1] ? selects[1].value.toLowerCase() : '');
-  const textF   = input ? input.value.toLowerCase() : '';
+  const statusF = getVal(`f-${key}-s`);
+  const priF    = getVal(`f-${key}-p`);
+  const methodF = getVal(`f-${key}-m`); // only exists for api; returns '' for others
+  const textF   = getVal(`f-${key}-q`);
 
-  const rows = document.querySelectorAll(`#body-${key} tr:not(.sr):not(.sr-api)`);
-  let shown = 0, total = rows.length;
+  const tbody = document.getElementById(`body-${key}`);
+  if (!tbody) return; // table not yet rendered
+
+  const rows = tbody.querySelectorAll('tr');
+  let shown = 0, total = 0;
+
   rows.forEach(r => {
+    // Skip section-header rows — always keep visible
+    if (r.classList.contains('sr') || r.classList.contains('sr-api')) {
+      r.style.display = '';
+      return;
+    }
+    total++;
     let vis = true;
     if (statusF && r.dataset.s !== statusF) vis = false;
-    if (methodF && r.dataset.m !== methodF) vis = false;
     if (priF    && r.dataset.p !== priF)    vis = false;
-    if (textF   && !r.dataset.q.includes(textF)) vis = false;
+    if (methodF && r.dataset.m !== methodF) vis = false;
+    if (textF   && !(r.dataset.q || '').includes(textF)) vis = false;
     r.style.display = vis ? '' : 'none';
     if (vis) shown++;
   });
-  const cEl = document.getElementById(key + '-c');
+
+  // Re-stripe visible rows so alternating colours stay correct after filtering
+  let visIdx = 0;
+  rows.forEach(r => {
+    if (r.classList.contains('sr') || r.classList.contains('sr-api')) return;
+    if (r.style.display === 'none') return;
+    r.style.background = visIdx % 2 === 0 ? '' : 'var(--row-alt)';
+    visIdx++;
+  });
+
+  const cEl = document.getElementById(`${key}-c`);
   if (cEl) cEl.textContent = shown === total ? `${total} test cases` : `Showing ${shown} of ${total}`;
+}
+
+// Re-apply active filters after every data reload so filter state persists
+function reapplyAllFilters() {
+  ['zp','rwd','con','edg','api'].forEach(k => applyFilter(k));
 }
 
 // ── SUMMARY: computed live from TC rows ─────────────────────────────────────
@@ -716,6 +738,9 @@ async function loadAllSheets() {
 
     document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
     setSyncState('live', 'Live');
+
+    // Re-apply any active filters so state persists after 60s auto-refresh
+    reapplyAllFilters();
 
   } catch (err) {
     console.error(err);
