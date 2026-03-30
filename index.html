@@ -7,6 +7,7 @@
 <style>
 :root{
   --db:#1F4E79;--mb:#2E75B6;--lb:#D6E4F0;
+  --teal:#1A6B72;
   --dg:#1E5C30;--amber:#7B3F00;--red:#C0392B;--orange:#D35400;
   --pass-bg:#E2EFDA;--pass-fg:#1E5C30;--pass-bd:#A9D18E;
   --fail-bg:#FCE4D6;--fail-fg:#C0392B;--fail-bd:#F4B183;
@@ -16,8 +17,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF3F9;color:var(--text);min-height:100vh}
-
-/* HEADER */
 .hdr{background:linear-gradient(135deg,var(--db) 0%,var(--mb) 100%);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.2);gap:12px;flex-wrap:wrap}
 .hdr h1{color:#fff;font-size:1.25rem;font-weight:700}
 .hdr p{color:rgba(255,255,255,.7);font-size:.76rem;margin-top:3px}
@@ -31,40 +30,27 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#EEF3F9;color:var(--text
 .refresh-btn{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3);padding:5px 13px;border-radius:20px;font-size:.72rem;font-weight:600;cursor:pointer;transition:background .15s}
 .refresh-btn:hover{background:rgba(255,255,255,.3)}
 #last-updated{color:rgba(255,255,255,.6);font-size:.7rem}
-
-/* KPI BAR */
 .kpi-bar{display:flex;gap:10px;padding:16px 32px;flex-wrap:wrap}
-.kpi{background:#fff;border-radius:var(--r);padding:13px 18px;flex:1;min-width:110px;box-shadow:var(--sh);border-top:4px solid var(--mb);display:flex;flex-direction:column;gap:3px;position:relative;overflow:hidden}
-.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:currentColor;opacity:.08}
+.kpi{background:#fff;border-radius:var(--r);padding:13px 18px;flex:1;min-width:110px;box-shadow:var(--sh);border-top:4px solid var(--mb);display:flex;flex-direction:column;gap:3px}
 .kpi.pass{border-color:var(--pass-fg)}.kpi.fail{border-color:var(--fail-fg)}.kpi.pend{border-color:var(--pend-fg)}.kpi.iss{border-color:var(--red)}.kpi.imp{border-color:var(--amber)}
 .kn{font-size:1.8rem;font-weight:800;line-height:1;color:var(--db);transition:all .3s}
 .kl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
 .kpi.pass .kn{color:var(--pass-fg)}.kpi.fail .kn{color:var(--fail-fg)}.kpi.pend .kn{color:var(--pend-fg)}.kpi.iss .kn{color:var(--red)}.kpi.imp .kn{color:var(--amber)}
-
-/* TABS */
 .tab-bar{display:flex;padding:0 32px;gap:2px;flex-wrap:wrap}
 .tab{padding:9px 15px;border-radius:7px 7px 0 0;cursor:pointer;font-size:.79rem;font-weight:600;color:var(--sub);background:#dde5ef;border:1px solid transparent;border-bottom:none;transition:all .15s;user-select:none}
 .tab:hover{background:#cdd8e8;color:var(--db)}
 .tab.active{background:#fff;color:var(--db);border-color:var(--brd);border-bottom:2px solid #fff;margin-bottom:-1px;z-index:1}
 .tab .tab-count{display:inline-block;background:rgba(0,0,0,.1);border-radius:8px;padding:1px 6px;font-size:.65rem;margin-left:4px}
 .tab.active .tab-count{background:var(--lb);color:var(--db)}
-
-/* CONTENT */
 .content{background:#fff;margin:0 32px 32px;border-radius:0 var(--r) var(--r) var(--r);box-shadow:var(--sh);border:1px solid var(--brd);overflow:hidden;min-height:300px}
 .pane{display:none}.pane.active{display:block}
-
-/* LOADING OVERLAY */
 .loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:16px;color:var(--sub)}
 .spinner{width:36px;height:36px;border:3px solid var(--lb);border-top-color:var(--mb);border-radius:50%;animation:spin 0.8s linear infinite}
 .loading-overlay p{font-size:.85rem}
-
-/* ERROR STATE */
 .error-box{margin:32px;padding:20px 24px;background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);border-left:4px solid var(--red)}
 .error-box h3{color:var(--red);font-size:.9rem;margin-bottom:8px}
 .error-box p{font-size:.8rem;color:#7f1d1d;line-height:1.6}
 .error-box code{background:#FEE2E2;padding:2px 6px;border-radius:4px;font-size:.75rem}
-
-/* TABLES */
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.78rem}
 thead tr{background:var(--db)}
@@ -73,8 +59,8 @@ tbody tr:nth-child(even){background:var(--row-alt)}
 tbody tr:hover{background:#e4eef8;transition:background .1s}
 tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;line-height:1.5}
 .sr td{background:var(--mb) !important;color:#fff;font-weight:700;font-size:.75rem;padding:7px 11px;letter-spacing:.3px}
-
-/* BADGES */
+/* API sheet section headers get teal colour */
+.sr-api td{background:var(--teal) !important;color:#fff;font-weight:700;font-size:.75rem;padding:7px 11px;letter-spacing:.3px}
 .tc-id{font-family:'Courier New',monospace;font-weight:700;color:var(--db);font-size:.75rem;white-space:nowrap}
 .pri{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.65rem;font-weight:700;white-space:nowrap}
 .pc{background:#FDECEA;color:#C0392B;border:1px solid #F4B183}
@@ -86,34 +72,36 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
 .sf{background:var(--fail-bg);color:var(--fail-fg);border:1px solid var(--fail-bd)}
 .sn{background:var(--pend-bg);color:var(--pend-fg);border:1px solid var(--pend-bd)}
 .act-cell{color:var(--orange);font-style:italic;font-size:.73rem;line-height:1.45}
-.note-tag{display:inline-block;background:#EDE9FE;color:#5B21B6;border-radius:4px;padding:1px 6px;font-size:.68rem;font-style:normal;margin-top:3px}
 .steps{white-space:pre-line;font-size:.72rem;color:#444}
 .exp{font-size:.72rem;color:#1e4d22}
-
-/* FILTER BAR */
+.http-badge{display:inline-block;padding:2px 8px;border-radius:5px;font-size:.68rem;font-weight:700;font-family:'Courier New',monospace}
+.http-get{background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9}
+.http-post{background:#F3E8FF;color:#6B21A8;border:1px solid #D8B4FE}
 .fb{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--brd);flex-wrap:wrap;background:#fafbfc}
 .fb label{font-size:.72rem;font-weight:600;color:var(--sub)}
 .fb select,.fb input{padding:5px 9px;border:1px solid var(--brd);border-radius:5px;font-size:.75rem;background:#fff;color:var(--text);outline:none}
 .fb select:focus,.fb input:focus{border-color:var(--mb)}
 .fb input{min-width:180px}
 .fc{margin-left:auto;font-size:.72rem;color:var(--sub);font-style:italic}
-
 /* SUMMARY */
 .sw{padding:24px}
 .sw-hdr{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
 .sw-hdr h2{font-size:.95rem;font-weight:700;color:var(--db)}
 .sw-hdr span{font-size:.75rem;color:var(--sub)}
+.sum-section{margin-bottom:28px}
+.sum-section-title{font-size:.82rem;font-weight:700;padding:8px 14px;border-radius:6px 6px 0 0;color:#fff;margin-bottom:0}
 .sum-t{width:100%;border-collapse:collapse;font-size:.8rem}
 .sum-t thead tr{background:var(--db)}
 .sum-t thead th{color:#fff;padding:10px 13px;text-align:left;font-size:.71rem;text-transform:uppercase;letter-spacing:.4px}
+.sum-t.api thead tr{background:var(--teal)}
 .sum-t tbody tr:nth-child(even){background:var(--row-alt)}
 .sum-t tbody tr:hover{background:#e4eef8}
 .sum-t td{padding:10px 13px;border-bottom:1px solid var(--brd)}
-.sum-t .tr td{background:var(--db);color:#fff;font-weight:700}
+.sum-t .tr-total td{background:var(--db);color:#fff;font-weight:700}
+.sum-t.api .tr-total td{background:var(--teal)}
 .pb{display:flex;align-items:center;gap:6px}
 .pbr{height:7px;border-radius:4px;background:#e0e8f0;flex:1;overflow:hidden;min-width:70px}
 .pbf{height:100%;border-radius:4px;transition:width .5s ease}
-
 /* ISSUES */
 .ig{display:grid;grid-template-columns:1fr 1fr;gap:0}
 .ic{padding:22px}.ic:first-child{border-right:1px solid var(--brd)}
@@ -126,22 +114,18 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
 .icard.imp{border-left:4px solid var(--amber)}
 .it{padding:9px 13px 5px;font-weight:700;font-size:.79rem;background:#fafafa}
 .ib{padding:5px 13px 12px;font-size:.76rem;color:#444;line-height:1.6}
-
-/* RESPONSIVE */
 @media(max-width:860px){
   .ig{grid-template-columns:1fr}.ic:first-child{border-right:none;border-bottom:1px solid var(--brd)}
   .kpi-bar,.tab-bar{padding-left:14px;padding-right:14px}
-  .content{margin:0 0 24px}
-  .hdr{padding:14px}
+  .content{margin:0 0 24px}.hdr{padding:14px}
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="hdr">
   <div>
-    <h1>Zolve × Switchfly — Z Points QA Dashboard</h1>
+    <h1>Zolve × Switchfly — QA Dashboard</h1>
     <p>Live data from Google Sheets &nbsp;·&nbsp; Auto-refreshes every 60 seconds</p>
   </div>
   <div class="hdr-right">
@@ -154,7 +138,6 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   </div>
 </div>
 
-<!-- KPI BAR -->
 <div class="kpi-bar">
   <div class="kpi">       <div class="kn" id="k-total" style="color:var(--db)">—</div><div class="kl">Total Test Cases</div></div>
   <div class="kpi pass">  <div class="kn" id="k-pass">—</div><div class="kl">✓ Passed</div></div>
@@ -164,17 +147,16 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
   <div class="kpi imp">   <div class="kn" id="k-imp" style="color:var(--amber)">—</div><div class="kl">🟡 Improvements</div></div>
 </div>
 
-<!-- TABS -->
 <div class="tab-bar">
   <div class="tab active" onclick="showTab(this,'summary')">📊 Summary</div>
   <div class="tab" onclick="showTab(this,'zpoints')">💎 Z Points <span class="tab-count" id="tc-zp">—</span></div>
   <div class="tab" onclick="showTab(this,'rewards')">🏅 Rewards <span class="tab-count" id="tc-rwd">—</span></div>
   <div class="tab" onclick="showTab(this,'concurrent')">📱 Multi-Device <span class="tab-count" id="tc-con">—</span></div>
   <div class="tab" onclick="showTab(this,'edge')">⚠️ Edge Cases <span class="tab-count" id="tc-edg">—</span></div>
+  <div class="tab" onclick="showTab(this,'api')">🔌 API Test Cases <span class="tab-count" id="tc-api">—</span></div>
   <div class="tab" onclick="showTab(this,'issues')">🐛 Issues</div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
   <!-- SUMMARY -->
@@ -246,6 +228,23 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
     </div>
   </div>
 
+  <!-- API TEST CASES -->
+  <div class="pane" id="pane-api">
+    <div class="fb">
+      <label>Status:</label>
+      <select onchange="applyFilter('api')"><option value="">All</option><option>Pass</option><option>Fail</option><option>Pending</option></select>
+      <label>Method:</label>
+      <select onchange="applyFilter('api')"><option value="">All</option><option>GET</option><option>POST</option></select>
+      <label>Priority:</label>
+      <select onchange="applyFilter('api')"><option value="">All</option><option>Critical</option><option>High</option><option>Medium</option></select>
+      <input type="text" placeholder="Search endpoint or scenario…" oninput="applyFilter('api')"/>
+      <span class="fc" id="api-c"></span>
+    </div>
+    <div class="tbl-wrap" id="wrap-api">
+      <div class="loading-overlay"><div class="spinner"></div><p>Loading API test cases…</p></div>
+    </div>
+  </div>
+
   <!-- ISSUES -->
   <div class="pane" id="pane-issues">
     <div class="ig">
@@ -260,10 +259,10 @@ tbody td{padding:9px 11px;border-bottom:1px solid var(--brd);vertical-align:top;
     </div>
   </div>
 
-</div><!-- /content -->
+</div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────────────────
 const SHEET_ID = '1ytPFFWVN-xqYon00eRnrMuTq9gAqlfS47DzvuWrQTz0';
 const BASE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=`;
 
@@ -272,11 +271,11 @@ const SHEET_MAP = {
   rwd: '🏅 Rewards Display & History',
   con: '📱 Concurrent & Multi-Device',
   edg: '⚠️ Edge Cases',
-  sum: '📊 Summary',
+  api: '🔌 API Test Cases',
   iss: 'Issues',
 };
 
-// ── CSV PARSER ────────────────────────────────────────────────────────────────
+// ── CSV PARSER ──────────────────────────────────────────────────────────────
 function parseCSV(text) {
   const rows = [];
   let i = 0, n = text.length;
@@ -298,26 +297,24 @@ function parseCSV(text) {
       }
       if (i < n && text[i] === ',') i++;
     }
-    if (i < n) i++; // skip \n
+    if (i < n) i++;
     if (row.some(c => c !== '')) rows.push(row);
   }
   return rows;
 }
 
-// ── FETCH A SHEET ─────────────────────────────────────────────────────────────
 async function fetchSheet(key) {
-  const name = encodeURIComponent(SHEET_MAP[key]);
-  const url  = BASE_URL + name;
-  const res  = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const url = BASE_URL + encodeURIComponent(SHEET_MAP[key]);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} fetching ${key}`);
   return parseCSV(await res.text());
 }
 
-// ── BADGES ────────────────────────────────────────────────────────────────────
+// ── BADGES ─────────────────────────────────────────────────────────────────
 function stBadge(s) {
   const k = (s||'').toLowerCase().trim();
-  if (k === 'pass')    return `<span class="st sp">✓ Pass</span>`;
-  if (k === 'fail')    return `<span class="st sf">✗ Fail</span>`;
+  if (k === 'pass') return `<span class="st sp">✓ Pass</span>`;
+  if (k === 'fail') return `<span class="st sf">✗ Fail</span>`;
   return `<span class="st sn">⏳ Pending</span>`;
 }
 function priBadge(p) {
@@ -328,15 +325,17 @@ function priBadge(p) {
   if (k === 'low')      return `<span class="pri pl">Low</span>`;
   return '';
 }
+function methodBadge(m) {
+  const k = (m||'').toUpperCase().trim();
+  if (k === 'GET')  return `<span class="http-badge http-get">GET</span>`;
+  if (k === 'POST') return `<span class="http-badge http-post">POST</span>`;
+  return `<span class="http-badge">${k}</span>`;
+}
 
-// ── RENDER TC TABLE ───────────────────────────────────────────────────────────
-// Columns from sheet: TC ID | Category | Sub-Category | Test Scenario |
-//   Pre-conditions | Test Steps | Expected Result | Actual Result | Priority | Status
-// (row[0]=ID, row[2]=sub, row[3]=scenario, row[4]=pre, row[5]=steps,
-//  row[6]=expected, row[7]=actual, row[8]=pri, row[9]=status)
-
+// ── RENDER: standard TC table (Z Points / Rewards / Concurrent / Edge) ──────
+// Columns: TC ID[0] | Category[1] | Sub-Category[2] | Test Scenario[3] |
+//          Pre-conditions[4] | Test Steps[5] | Expected[6] | Actual[7] | Priority[8] | Status[9]
 function buildTCTable(rows, key) {
-  // skip title row (row[0]) and header row (row[1])
   const data = rows.slice(2);
   let html = `<table>
     <thead><tr>
@@ -352,33 +351,31 @@ function buildTCTable(rows, key) {
   let count = 0;
   data.forEach(r => {
     const id = r[0] || '';
-    // Section header row: has content in col 0 but no TC ID format and rest empty
     if (id.startsWith('  ') || (!id.match(/^TC-/) && id !== '')) {
       html += `<tr class="sr"><td colspan="9">${id.trim()}</td></tr>`;
       return;
     }
     if (!id.match(/^TC-/)) return;
     count++;
-    const sub      = r[2] || '';
-    const scenario = r[3] || '';
-    const pre      = r[4] || '';
-    const steps    = (r[5] || '').replace(/\\n/g, '\n');
-    const exp      = r[6] || '';
-    const actual   = r[7] || '';
-    const pri      = r[8] || '';
-    const status   = r[9] || 'Pending';
-
+    const sub    = r[2] || '';
+    const scene  = r[3] || '';
+    const pre    = r[4] || '';
+    const steps  = (r[5] || '').replace(/\\n/g, '\n');
+    const exp    = r[6] || '';
+    const actual = r[7] || '';
+    const pri    = r[8] || '';
+    const status = r[9] || 'Pending';
     const actCell = actual
       ? `<td class="act-cell">${actual}</td>`
       : `<td style="color:#ccc;font-size:.7rem">—</td>`;
-
     html += `<tr
       data-s="${status.toLowerCase().trim()}"
       data-p="${pri.toLowerCase().trim()}"
-      data-q="${(scenario + ' ' + sub).toLowerCase()}">
+      data-m=""
+      data-q="${(scene+' '+sub).toLowerCase()}">
       <td class="tc-id">${id}</td>
       <td><strong>${sub}</strong></td>
-      <td>${scenario}</td>
+      <td>${scene}</td>
       <td style="font-size:.72rem;color:#555">${pre}</td>
       <td class="steps">${steps}</td>
       <td class="exp">${exp}</td>
@@ -391,21 +388,95 @@ function buildTCTable(rows, key) {
   return { html, count };
 }
 
-// ── FILTER ────────────────────────────────────────────────────────────────────
+// ── RENDER: API TC table ────────────────────────────────────────────────────
+// Columns: TC ID[0] | API Endpoint[1] | Method[2] | Test Scenario[3] |
+//          Request Headers[4] | Request Body[5] | Expected HTTP Status[6] |
+//          Expected Response[7] | Actual Result[8] | Priority[9] | Status[10]
+function buildAPITable(rows) {
+  const data = rows.slice(2);
+  let html = `<table>
+    <thead><tr>
+      <th>TC ID</th>
+      <th style="min-width:200px">API Endpoint</th>
+      <th>Method</th>
+      <th style="min-width:210px">Test Scenario</th>
+      <th style="min-width:180px">Request Headers</th>
+      <th style="min-width:200px">Request Body / Params</th>
+      <th>Expected Status</th>
+      <th style="min-width:200px">Expected Response</th>
+      <th style="min-width:160px">Actual Result</th>
+      <th>Priority</th>
+      <th>Status</th>
+    </tr></thead><tbody id="body-api">`;
+
+  let count = 0;
+  data.forEach(r => {
+    const id = r[0] || '';
+    if (id.startsWith('  ') || (!id.match(/^TC-/) && id !== '')) {
+      html += `<tr class="sr-api"><td colspan="11">${id.trim()}</td></tr>`;
+      return;
+    }
+    if (!id.match(/^TC-/)) return;
+    count++;
+    const endpoint = r[1]  || '';
+    const method   = r[2]  || '';
+    const scene    = r[3]  || '';
+    const headers  = (r[4]  || '').replace(/\\n/g, '\n');
+    const body     = (r[5]  || '').replace(/\\n/g, '\n');
+    const httpSt   = r[6]  || '';
+    const expResp  = (r[7]  || '').replace(/\\n/g, '\n');
+    const actual   = r[8]  || '';
+    const pri      = r[9]  || '';
+    const status   = r[10] || 'Pending';
+
+    const actCell = actual
+      ? `<td class="act-cell">${actual}</td>`
+      : `<td style="color:#ccc;font-size:.7rem">—</td>`;
+
+    html += `<tr
+      data-s="${status.toLowerCase().trim()}"
+      data-p="${pri.toLowerCase().trim()}"
+      data-m="${method.toLowerCase().trim()}"
+      data-q="${(scene+' '+endpoint).toLowerCase()}">
+      <td class="tc-id">${id}</td>
+      <td style="font-size:.73rem;font-family:'Courier New',monospace;color:var(--db)">${endpoint}</td>
+      <td>${methodBadge(method)}</td>
+      <td>${scene}</td>
+      <td class="steps">${headers}</td>
+      <td class="steps">${body}</td>
+      <td style="text-align:center;font-weight:700;font-size:.73rem">${httpSt}</td>
+      <td class="exp">${expResp}</td>
+      ${actCell}
+      <td>${priBadge(pri)}</td>
+      <td>${stBadge(status)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  return { html, count };
+}
+
+// ── FILTER ──────────────────────────────────────────────────────────────────
 function applyFilter(key) {
-  const wrap = document.getElementById('wrap-' + key);
-  if (!wrap) return;
-  const selects = wrap.closest('.pane').querySelectorAll('.fb select');
-  const input   = wrap.closest('.pane').querySelector('.fb input');
+  const pane    = document.getElementById('pane-' + key);
+  if (!pane) return;
+  const selects = pane.querySelectorAll('.fb select');
+  const input   = pane.querySelector('.fb input');
+
+  // For API pane: select[0]=status, select[1]=method, select[2]=priority
+  // For others:   select[0]=status, select[1]=priority (no method)
+  const isAPI   = key === 'api';
   const statusF = selects[0] ? selects[0].value.toLowerCase() : '';
-  const priF    = selects[1] ? selects[1].value.toLowerCase() : '';
+  const methodF = isAPI && selects[1] ? selects[1].value.toLowerCase() : '';
+  const priF    = isAPI ? (selects[2] ? selects[2].value.toLowerCase() : '')
+                        : (selects[1] ? selects[1].value.toLowerCase() : '');
   const textF   = input ? input.value.toLowerCase() : '';
 
-  const rows = document.querySelectorAll(`#body-${key} tr:not(.sr)`);
+  const rows = document.querySelectorAll(`#body-${key} tr:not(.sr):not(.sr-api)`);
   let shown = 0, total = rows.length;
   rows.forEach(r => {
     let vis = true;
     if (statusF && r.dataset.s !== statusF) vis = false;
+    if (methodF && r.dataset.m !== methodF) vis = false;
     if (priF    && r.dataset.p !== priF)    vis = false;
     if (textF   && !r.dataset.q.includes(textF)) vis = false;
     r.style.display = vis ? '' : 'none';
@@ -415,260 +486,256 @@ function applyFilter(key) {
   if (cEl) cEl.textContent = shown === total ? `${total} test cases` : `Showing ${shown} of ${total}`;
 }
 
-// ── RENDER SUMMARY ────────────────────────────────────────────────────────────
-function buildSummary(allTCData) {
-  // Compute counts live from actual TC sheet rows — never trust the Summary sheet values
-  const SHEET_SECTIONS = {
-    '💎 Z Points Redemption': ['POINTS-ONLY REDEMPTION', 'HYBRID PAYMENT', 'REFUND'],
-    '🏅 Rewards Display & History': ['REWARDS SECTION'],
-    '📱 Concurrent & Multi-Device': ['SIMULTANEOUS SESSIONS'],
-    '⚠️ Edge Cases': ['BOUNDARY', 'NETWORK', 'PRODUCT-SPECIFIC'],
-  };
+// ── SUMMARY: computed live from TC rows ─────────────────────────────────────
+const SECTION_LABELS = {
+  'POINTS-ONLY REDEMPTION': ['Z Points Only',     'Points-Only Redemption'],
+  'HYBRID PAYMENT':         ['Hybrid Payment',    'Z Points + Credit Card'],
+  'REFUND':                 ['Refund',            'Points Refund & Reversal'],
+  'REWARDS SECTION':        ['Rewards Display',   'Transaction Description & History'],
+  'SIMULTANEOUS SESSIONS':  ['Concurrent',        'Simultaneous Sessions'],
+  'BOUNDARY':               ['Boundary',          'Points Thresholds & Arithmetic'],
+  'NETWORK':                ['Network/Session',   'Network & Session Edge Cases'],
+  'PRODUCT-SPECIFIC':       ['Product-Specific',  'Product-Specific Edge Cases'],
+};
 
-  const SECTION_LABELS = {
-    'POINTS-ONLY REDEMPTION': 'Points-Only Redemption',
-    'HYBRID PAYMENT':         'Z Points + Credit Card',
-    'REFUND':                 'Points Refund & Reversal',
-    'REWARDS SECTION':        'Transaction Description & History',
-    'SIMULTANEOUS SESSIONS':  'Simultaneous Sessions',
-    'BOUNDARY':               'Points Thresholds & Arithmetic',
-    'NETWORK':                'Network & Session Edge Cases',
-    'PRODUCT-SPECIFIC':       'Product-Specific Edge Cases',
-  };
+const API_LABELS = {
+  'USER-TOKEN':    ['user-token',       'POST /v1/switchfly/user-token',                'JWT userToken generation'],
+  'OAUTH2-URL':    ['oauth2-url',       'POST /api/v1/support/switchfly/oauth2-url',    'SSO URL generation'],
+  'TOKEN':         ['token',            'POST /v1/switchfly/token',                     'SSO & refund scope'],
+  'TRAVELER':      ['traveler-profile', 'GET /v1/switchfly/traveler-profile',           'Profile & points accuracy'],
+  'REDEEM':        ['redeem',           'POST /v1/switchfly/redeem',                    'Points deduction'],
+  'REFUND':        ['refund',           'POST /v1/switchfly/refund',                    'Points credit / refund'],
+};
 
-  const CATEGORY_LABELS = {
-    'POINTS-ONLY REDEMPTION': 'Z Points Only',
-    'HYBRID PAYMENT':         'Hybrid Payment',
-    'REFUND':                 'Refund',
-    'REWARDS SECTION':        'Rewards Display',
-    'SIMULTANEOUS SESSIONS':  'Concurrent',
-    'BOUNDARY':               'Boundary',
-    'NETWORK':                'Network/Session',
-    'PRODUCT-SPECIFIC':       'Product-Specific',
-  };
-
-  // Parse each TC sheet and count by section
+function countSections(rows, statusColIdx) {
   const results = [];
-  let grandTotal = 0, grandPass = 0, grandFail = 0, grandPend = 0;
-
-  for (const [sheetName, rows] of Object.entries(allTCData)) {
-    const sectionCounts = {};
-    let currentSection = null;
-
-    for (let i = 2; i < rows.length; i++) {
-      const r = rows[i];
-      const col0 = (r[0] || '').trim();
-
-      // Detect section header rows (leading spaces or no TC- prefix)
-      if (!col0.startsWith('TC-')) {
-        if (col0) {
-          // Match section key by checking if any known key appears in the header text
-          const matchedKey = Object.keys(SECTION_LABELS).find(k =>
-            col0.toUpperCase().includes(k)
-          );
-          if (matchedKey) {
-            currentSection = matchedKey;
-            sectionCounts[currentSection] = { total: 0, pass: 0, fail: 0, pending: 0 };
-          }
-        }
-        continue;
+  let currentKey = null, counts = null;
+  for (let i = 2; i < rows.length; i++) {
+    const r = rows[i];
+    const col0 = (r[0] || '').trim();
+    if (!col0.startsWith('TC-')) {
+      if (col0) {
+        if (counts && currentKey) results.push([currentKey, { ...counts }]);
+        currentKey = col0.toUpperCase();
+        counts = { total:0, pass:0, fail:0, pending:0 };
       }
-
-      if (!currentSection) continue;
-
-      const status = (r[9] || '').toString().trim().toLowerCase();
-      sectionCounts[currentSection].total++;
-      if (status === 'pass')       sectionCounts[currentSection].pass++;
-      else if (status === 'fail')  sectionCounts[currentSection].fail++;
-      else                         sectionCounts[currentSection].pending++;
+      continue;
     }
-
-    for (const [secKey, counts] of Object.entries(sectionCounts)) {
-      results.push({
-        sheet:    sheetName,
-        category: CATEGORY_LABELS[secKey] || secKey,
-        section:  SECTION_LABELS[secKey]  || secKey,
-        ...counts,
-      });
-      grandTotal += counts.total;
-      grandPass  += counts.pass;
-      grandFail  += counts.fail;
-      grandPend  += counts.pending;
-    }
+    if (!counts) continue;
+    const st = (r[statusColIdx] || '').toString().trim().toLowerCase();
+    counts.total++;
+    if (st === 'pass')      counts.pass++;
+    else if (st === 'fail') counts.fail++;
+    else                    counts.pending++;
   }
+  if (counts && currentKey) results.push([currentKey, { ...counts }]);
+  return results;
+}
 
-  // Build table HTML
-  let html = `<table class="sum-t">
+function progressBar(pct) {
+  const col = pct === 100 ? 'var(--pass-fg)' : pct > 50 ? 'var(--mb)' : 'var(--pend-fg)';
+  return `<div class="pb">
+    <div class="pbr"><div class="pbf" style="width:${pct}%;background:${col}"></div></div>
+    <span style="font-size:.7rem;color:var(--sub);min-width:28px">${pct}%</span>
+  </div>`;
+}
+
+function buildSummary(allTC) {
+  let gT=0,gP=0,gF=0,gQ=0;   // grand totals across ALL sheets
+  let aT=0,aP=0,aF=0,aQ=0;   // API totals
+
+  // ── Part A: Z Points / Rewards / Multi-Device / Edge ──────────────────────
+  let aHtml = `<table class="sum-t">
     <thead><tr>
       <th>Sheet</th><th>Category</th><th>Section</th>
       <th style="text-align:center"># TCs</th>
       <th style="text-align:center">Pass</th>
       <th style="text-align:center">Fail</th>
       <th style="text-align:center">Pending</th>
-      <th style="min-width:160px">Progress</th>
+      <th style="min-width:150px">Progress</th>
     </tr></thead><tbody>`;
 
-  results.forEach(r => {
-    const pct = r.total ? Math.round(r.pass / r.total * 100) : 0;
-    const col = pct === 100 ? 'var(--pass-fg)' : pct > 50 ? 'var(--mb)' : 'var(--pend-fg)';
-    html += `<tr>
-      <td><strong>${r.sheet}</strong></td>
-      <td>${r.category}</td>
-      <td>${r.section}</td>
-      <td style="text-align:center;font-weight:700">${r.total}</td>
-      <td style="text-align:center"><span style="color:var(--pass-fg);font-weight:700">${r.pass}</span></td>
-      <td style="text-align:center"><span style="color:var(--fail-fg);font-weight:700">${r.fail || '—'}</span></td>
-      <td style="text-align:center"><span style="color:var(--pend-fg);font-weight:700">${r.pending}</span></td>
-      <td><div class="pb">
-        <div class="pbr"><div class="pbf" style="width:${pct}%;background:${col}"></div></div>
-        <span style="font-size:.7rem;color:var(--sub);min-width:28px">${pct}%</span>
-      </div></td>
+  const tcSheets = [
+    ['💎 Z Points Redemption',    allTC.zp,  9],
+    ['🏅 Rewards Display & History', allTC.rwd, 9],
+    ['📱 Concurrent & Multi-Device', allTC.con, 9],
+    ['⚠️ Edge Cases',             allTC.edg, 9],
+  ];
+
+  tcSheets.forEach(([sheetName, rows, stCol]) => {
+    const secs = countSections(rows, stCol);
+    secs.forEach(([rawKey, c]) => {
+      const matched = Object.entries(SECTION_LABELS).find(([k]) => rawKey.includes(k));
+      const [cat, sec] = matched ? matched[1] : [rawKey.slice(0,20), rawKey.slice(0,30)];
+      const pct = c.total ? Math.round(c.pass / c.total * 100) : 0;
+      gT+=c.total; gP+=c.pass; gF+=c.fail; gQ+=c.pending;
+      aHtml += `<tr>
+        <td><strong>${sheetName}</strong></td><td>${cat}</td><td>${sec}</td>
+        <td style="text-align:center;font-weight:700">${c.total}</td>
+        <td style="text-align:center;color:var(--pass-fg);font-weight:700">${c.pass}</td>
+        <td style="text-align:center;color:var(--fail-fg);font-weight:700">${c.fail||'—'}</td>
+        <td style="text-align:center;color:var(--pend-fg);font-weight:700">${c.pending}</td>
+        <td>${progressBar(pct)}</td>
+      </tr>`;
+    });
+  });
+
+  const pctA = gT ? Math.round(gP/gT*100) : 0;
+  aHtml += `<tr class="tr-total">
+    <td colspan="3"><strong>TOTAL</strong></td>
+    <td style="text-align:center"><strong>${gT}</strong></td>
+    <td style="text-align:center"><strong>${gP}</strong></td>
+    <td style="text-align:center"><strong>${gF}</strong></td>
+    <td style="text-align:center"><strong>${gQ}</strong></td>
+    <td>${progressBar(pctA)}</td>
+  </tr></tbody></table>`;
+
+  // ── Part B: API Test Cases ─────────────────────────────────────────────────
+  let bHtml = `<table class="sum-t api">
+    <thead><tr>
+      <th>API</th><th>Endpoint</th><th>Method</th>
+      <th style="text-align:center"># TCs</th>
+      <th style="text-align:center">Pass</th>
+      <th style="text-align:center">Fail</th>
+      <th style="text-align:center">Pending</th>
+      <th style="min-width:150px">Progress</th>
+    </tr></thead><tbody>`;
+
+  const apiSecs = countSections(allTC.api, 10);
+  apiSecs.forEach(([rawKey, c]) => {
+    const matched = Object.entries(API_LABELS).find(([k]) => rawKey.includes(k));
+    const [api, ep, _] = matched ? matched[1] : [rawKey.slice(0,15), rawKey.slice(0,35), ''];
+    const method = ep.startsWith('GET') ? 'GET' : 'POST';
+    const pct    = c.total ? Math.round(c.pass / c.total * 100) : 0;
+    aT+=c.total; aP+=c.pass; aF+=c.fail; aQ+=c.pending;
+    bHtml += `<tr>
+      <td><strong>${api}</strong></td>
+      <td style="font-size:.73rem;font-family:'Courier New',monospace">${ep}</td>
+      <td><span class="http-badge ${method==='GET'?'http-get':'http-post'}">${method}</span></td>
+      <td style="text-align:center;font-weight:700">${c.total}</td>
+      <td style="text-align:center;color:var(--pass-fg);font-weight:700">${c.pass}</td>
+      <td style="text-align:center;color:var(--fail-fg);font-weight:700">${c.fail||'—'}</td>
+      <td style="text-align:center;color:var(--pend-fg);font-weight:700">${c.pending}</td>
+      <td>${progressBar(pct)}</td>
     </tr>`;
   });
 
-  const tp = grandTotal ? Math.round(grandPass / grandTotal * 100) : 0;
-  html += `<tr class="tr-total">
+  const pctB = aT ? Math.round(aP/aT*100) : 0;
+  bHtml += `<tr class="tr-total">
     <td colspan="3"><strong>TOTAL</strong></td>
-    <td style="text-align:center"><strong>${grandTotal}</strong></td>
-    <td style="text-align:center"><strong>${grandPass}</strong></td>
-    <td style="text-align:center"><strong>${grandFail}</strong></td>
-    <td style="text-align:center"><strong>${grandPend}</strong></td>
-    <td><div class="pb">
-      <div class="pbr" style="background:rgba(255,255,255,.25)">
-        <div class="pbf" style="width:${tp}%;background:#90EE90"></div>
-      </div>
-      <span style="font-size:.7rem;min-width:28px">${tp}%</span>
-    </div></td>
+    <td style="text-align:center"><strong>${aT}</strong></td>
+    <td style="text-align:center"><strong>${aP}</strong></td>
+    <td style="text-align:center"><strong>${aF}</strong></td>
+    <td style="text-align:center"><strong>${aQ}</strong></td>
+    <td>${progressBar(pctB)}</td>
   </tr></tbody></table>`;
 
-  // Update KPI bar
-  document.getElementById('k-total').textContent = grandTotal;
-  document.getElementById('k-pass').textContent  = grandPass;
-  document.getElementById('k-fail').textContent  = grandFail;
-  document.getElementById('k-pend').textContent  = grandPend;
+  // ── Grand KPI update ───────────────────────────────────────────────────────
+  const allTotal = gT + aT;
+  const allPass  = gP + aP;
+  const allFail  = gF + aF;
+  const allPend  = gQ + aQ;
+  document.getElementById('k-total').textContent = allTotal;
+  document.getElementById('k-pass').textContent  = allPass;
+  document.getElementById('k-fail').textContent  = allFail;
+  document.getElementById('k-pend').textContent  = allPend;
 
-  return html;
+  return `
+    <div class="sum-section">
+      <div class="sum-section-title" style="background:var(--db);padding:8px 14px;border-radius:6px 6px 0 0;color:#fff;font-size:.8rem;font-weight:700">
+        💎 Z Points / 🏅 Rewards / 📱 Multi-Device / ⚠️ Edge Cases
+      </div>
+      ${aHtml}
+    </div>
+    <div class="sum-section">
+      <div class="sum-section-title" style="background:var(--teal);padding:8px 14px;border-radius:6px 6px 0 0;color:#fff;font-size:.8rem;font-weight:700">
+        🔌 API Test Cases
+      </div>
+      ${bHtml}
+    </div>`;
 }
-// ── RENDER ISSUES ─────────────────────────────────────────────────────────────
-// Issues sheet layout: col A = Major Issues, col B = Improvements
-// Alternating: title row, body row, blank, title row, body row, blank…
+
+// ── ISSUES ──────────────────────────────────────────────────────────────────
 function buildIssues(rows) {
   const major = [], impr = [];
-  // skip header row (row 0)
   const data = rows.slice(1);
   for (let i = 0; i < data.length; i++) {
-    const r = data[i];
-    const majTitle = r[0], impTitle = r[1];
-    if (!majTitle && !impTitle) continue;
-    // next row is the body
+    const r    = data[i];
     const next = data[i+1] || [];
-    if (majTitle && majTitle.match(/^\d+\./)) {
-      major.push({ t: majTitle.replace(/^\d+\.\s*/, ''), b: next[0] || '' });
-    }
-    if (impTitle && impTitle.match(/^\d+\./)) {
-      impr.push({ t: impTitle.replace(/^\d+\.\s*/, ''), b: next[1] || '' });
-    }
+    if (r[0] && r[0].match(/^\d+\./)) major.push({ t: r[0].replace(/^\d+\.\s*/,''), b: next[0]||'' });
+    if (r[1] && r[1].match(/^\d+\./)) impr.push({  t: r[1].replace(/^\d+\.\s*/,''), b: next[1]||'' });
   }
   return { major, impr };
 }
 
 function renderIssueCards(items, containerId, cls) {
   const el = document.getElementById(containerId);
-  if (!items.length) { el.innerHTML = '<p style="color:var(--sub);font-size:.8rem;padding:8px">No items found.</p>'; return; }
-  el.innerHTML = items.map((x, i) =>
-    `<div class="icard ${cls}">
-      <div class="it">${i+1}. ${x.t}</div>
-      <div class="ib">${x.b}</div>
-    </div>`
+  if (!items.length) { el.innerHTML = '<p style="color:var(--sub);font-size:.8rem;padding:8px">No items found.</p>'; return 0; }
+  el.innerHTML = items.map((x,i) =>
+    `<div class="icard ${cls}"><div class="it">${i+1}. ${x.t}</div><div class="ib">${x.b}</div></div>`
   ).join('');
   return items.length;
 }
 
-// ── MAIN LOAD ─────────────────────────────────────────────────────────────────
+// ── MAIN LOAD ────────────────────────────────────────────────────────────────
 async function loadAllSheets() {
   setSyncState('loading', 'Loading…');
-
   try {
-    // Load all sheets in parallel
-    const [zpRows, rwdRows, conRows, edgRows, sumRows, issRows] = await Promise.all([
-      fetchSheet('zp'),
-      fetchSheet('rwd'),
-      fetchSheet('con'),
-      fetchSheet('edg'),
-      fetchSheet('sum'),
-      fetchSheet('iss'),
+    const [zpRows, rwdRows, conRows, edgRows, apiRows, issRows] = await Promise.all([
+      fetchSheet('zp'), fetchSheet('rwd'), fetchSheet('con'),
+      fetchSheet('edg'), fetchSheet('api'), fetchSheet('iss'),
     ]);
 
-    // ── Summary
-    const allTCData = {
-  '💎 Z Points Redemption':    zpRows,
-  '🏅 Rewards Display & History': rwdRows,
-  '📱 Concurrent & Multi-Device': conRows,
-  '⚠️ Edge Cases':             edgRows,
-};
-    const sumHTML = buildSummary(allTCData);
+    // Summary — computed live from all TC rows
+    const sumHTML = buildSummary({ zp:zpRows, rwd:rwdRows, con:conRows, edg:edgRows, api:apiRows });
     document.getElementById('sum-area').innerHTML = sumHTML;
     const now = new Date();
     document.getElementById('sum-subtitle').textContent =
       `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
 
-    // ── TC tables
-    const sheets = [
-      { key:'zp',  rows:zpRows  },
-      { key:'rwd', rows:rwdRows },
-      { key:'con', rows:conRows },
-      { key:'edg', rows:edgRows },
-    ];
-    sheets.forEach(({ key, rows }) => {
-      const { html, count } = buildTCTable(rows, key);
-      document.getElementById('wrap-' + key).innerHTML = html;
-      document.getElementById(key + '-c').textContent  = count + ' test cases';
-      document.getElementById('tc-' + key).textContent = count;
+    // Standard TC tables
+    [['zp',zpRows],['rwd',rwdRows],['con',conRows],['edg',edgRows]].forEach(([k,rows]) => {
+      const { html, count } = buildTCTable(rows, k);
+      document.getElementById('wrap-'+k).innerHTML = html;
+      document.getElementById(k+'-c').textContent  = count + ' test cases';
+      document.getElementById('tc-'+k).textContent = count;
     });
 
-    // ── Issues
-    const { major, impr } = buildIssues(issRows);
-    const majN = renderIssueCards(major, 'maj-list', 'maj');
-    const impN = renderIssueCards(impr,  'imp-list', 'imp');
-    document.getElementById('maj-count').textContent = `(${majN})`;
-    document.getElementById('imp-count').textContent = `(${impN})`;
-    document.getElementById('k-iss').textContent = majN;
-    document.getElementById('k-imp').textContent = impN;
+    // API table
+    const { html: apiHtml, count: apiCount } = buildAPITable(apiRows);
+    document.getElementById('wrap-api').innerHTML = apiHtml;
+    document.getElementById('api-c').textContent  = apiCount + ' test cases';
+    document.getElementById('tc-api').textContent = apiCount;
 
-    // ── Sync state
-    const t = new Date();
-    document.getElementById('last-updated').textContent =
-      `Updated ${t.toLocaleTimeString()}`;
+    // Issues
+    const { major, impr } = buildIssues(issRows);
+    document.getElementById('maj-count').textContent = `(${renderIssueCards(major,'maj-list','maj')})`;
+    document.getElementById('imp-count').textContent = `(${renderIssueCards(impr,'imp-list','imp')})`;
+    document.getElementById('k-iss').textContent = major.length;
+    document.getElementById('k-imp').textContent = impr.length;
+
+    document.getElementById('last-updated').textContent = `Updated ${now.toLocaleTimeString()}`;
     setSyncState('live', 'Live');
 
   } catch (err) {
     console.error(err);
     setSyncState('error', 'Error');
-
-    const errorHTML = `
-      <div class="error-box">
-        <h3>⚠️ Could not load data from Google Sheets</h3>
-        <p>Make sure your sheet is published to the web:<br/>
-        <strong>Google Sheets → File → Share → Publish to web → Publish each sheet as CSV</strong></p>
-        <p style="margin-top:10px">If already published, the browser may be blocking the request due to CORS.
-        Try opening this file from a web server (e.g. VS Code Live Server, or drag into Chrome from a local HTTP server)
-        rather than directly as a <code>file://</code> path.</p>
-        <p style="margin-top:10px;color:#6b7280;font-size:.75rem">Error: ${err.message}</p>
-      </div>`;
-
-    ['sum-area','wrap-zp','wrap-rwd','wrap-con','wrap-edg','maj-list','imp-list']
-      .forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=errorHTML; });
+    const errHTML = `<div class="error-box">
+      <h3>⚠️ Could not load data from Google Sheets</h3>
+      <p>Make sure the sheet is published: <strong>File → Share → Publish to web → CSV</strong><br/>
+      Also ensure the file is served from a web server (not opened as a local <code>file://</code>).</p>
+      <p style="margin-top:8px;color:#6b7280;font-size:.74rem">Error: ${err.message}</p>
+    </div>`;
+    ['sum-area','wrap-zp','wrap-rwd','wrap-con','wrap-edg','wrap-api','maj-list','imp-list']
+      .forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=errHTML; });
   }
 }
 
 function setSyncState(state, label) {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.className = 'sync-dot ' + state;
-  lbl.textContent = label;
+  document.getElementById('sync-dot').className = 'sync-dot ' + state;
+  document.getElementById('sync-label').textContent = label;
 }
 
-// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
 function showTab(el, id) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
@@ -676,11 +743,8 @@ function showTab(el, id) {
   document.getElementById('pane-' + id).classList.add('active');
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
 loadAllSheets();
-// Auto-refresh every 60 seconds
 setInterval(loadAllSheets, 60000);
 </script>
-
 </body>
 </html>
